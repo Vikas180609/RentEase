@@ -12,30 +12,18 @@ dotenv.config();
 
 const app = express();
 
-// 💳 Initialize Stripe with your Secret Key from .env
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Middleware
 app.use(express.json());
 app.use(cors());
 
-// 🚨 Database Connection
 mongoose.connect('mongodb://localhost:27017/rentease')
     .then(() => console.log('✅ RentEase Database Connected'))
     .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
 
-// ==========================================
-// 🔐 AUTHENTICATION API
-// ==========================================
+
 app.use('/api/auth', authRoutes);
 
-
-// ==========================================
-// 🛋️ PRODUCT API (Furniture & Appliances)
-// ==========================================
-
-// GET all products (Supports category filtering on Home Page)
 app.get('/api/products', async (req, res) => {
     try {
         const { category } = req.query;
@@ -52,7 +40,6 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// GET products by owner email (For 'My Listings' Page)
 app.get('/api/products/owner/:email', async (req, res) => {
     try {
         const myProducts = await Product.find({ ownerEmail: req.params.email }).sort({ createdAt: -1 });
@@ -62,7 +49,6 @@ app.get('/api/products/owner/:email', async (req, res) => {
     }
 });
 
-// GET a single product by ID (For Product Details Page)
 app.get('/api/products/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -73,7 +59,6 @@ app.get('/api/products/:id', async (req, res) => {
     }
 });
 
-// POST a new product (For Add Product Page)
 app.post('/api/products', async (req, res) => {
     try {
         const newProduct = new Product(req.body);
@@ -85,7 +70,6 @@ app.post('/api/products', async (req, res) => {
     }
 });
 
-// DELETE a product
 app.delete('/api/products/:id', async (req, res) => {
     try {
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);
@@ -96,7 +80,6 @@ app.delete('/api/products/:id', async (req, res) => {
     }
 });
 
-// PUT (Update) a product
 app.put('/api/products/:id', async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -117,9 +100,6 @@ app.put('/api/products/:id', async (req, res) => {
 });
 
 
-// ==========================================
-// 💳 STRIPE PAYMENT API
-// ==========================================
 app.post('/api/stripe/create-checkout-session', async (req, res) => {
     try {
         const { items, userEmail } = req.body;
@@ -154,12 +134,6 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
     }
 });
 
-
-// ==========================================
-// 📦 ORDERS API (Checkout & Order History)
-// ==========================================
-
-// POST: Create a new rental order (From Checkout Page)
 app.post('/api/orders', async (req, res) => {
     try {
         const newOrder = new Order(req.body);
@@ -171,7 +145,6 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-// GET: Fetch orders for a specific user
 app.get('/api/orders/:email', async (req, res) => {
     try {
         const userOrders = await Order.find({ userEmail: req.params.email }).sort({ createdAt: -1 });
@@ -182,9 +155,10 @@ app.get('/api/orders/:email', async (req, res) => {
 });
 
 
-// ==========================================
-// START SERVER
-// ==========================================
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ message: 'RentEase Backend is awake!' });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 RentEase Backend running on port ${PORT}`);
