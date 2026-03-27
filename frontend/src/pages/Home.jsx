@@ -12,7 +12,7 @@ const Home = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/api/products?category=${selectedCategory}`);
+        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/products?category=${selectedCategory}`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

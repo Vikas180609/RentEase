@@ -15,7 +15,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/products/${id}`);
         setProduct(response.data);
         if (response.data.tenureOptions?.length > 0) {
           setSelectedTenure(response.data.tenureOptions[0]);

@@ -38,7 +38,7 @@ const Checkout = () => {
 
     try {
       // 2. Ask backend to generate a Stripe Checkout URL
-      const response = await axios.post('http://localhost:5000/api/stripe/create-checkout-session', {
+      const response = await axios.post('https://rentease-iz7b.onrender.com/api/stripe/create-checkout-session', {
         items: cart,
         userEmail: userInfo.email,
       });

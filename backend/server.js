@@ -7,6 +7,7 @@ import Stripe from 'stripe';
 import Product from './models/Product.js'; 
 import Order from './models/Order.js'; 
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ mongoose.connect('mongodb://localhost:27017/rentease')
 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/api/products', async (req, res) => {
     try {

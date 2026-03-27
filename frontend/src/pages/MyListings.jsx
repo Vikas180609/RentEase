@@ -15,7 +15,7 @@ const MyListings = () => {
   useEffect(() => {
     const fetchMyListings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/owner/${userInfo.email}`);
+        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/products/owner/${userInfo.email}`);
         setListings(response.data);
       } catch (error) {
         console.error("Error fetching listings:", error);
@@ -30,7 +30,7 @@ const MyListings = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this listing from your vault?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/products/${id}`);
+        await axios.delete(`https://rentease-iz7b.onrender.com/api/products/${id}`);
         setListings(listings.filter((item) => item._id !== id));
       } catch (error) {
         alert("Failed to delete listing.");
@@ -50,7 +50,7 @@ const MyListings = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, editingProduct);
+      const response = await axios.put(`https://rentease-iz7b.onrender.com/api/products/${editingProduct._id}`, editingProduct);
       setListings(listings.map(item => item._id === editingProduct._id ? response.data : item));
       setIsModalOpen(false); 
     } catch (error) {

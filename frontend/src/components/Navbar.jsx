@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { User, LogOut, ShoppingBag, PlusCircle, Store, Key, LayoutGrid } from "lucide-react"; 
+// Cleaned up the imports: removed the unused icons (LayoutGrid, PlusCircle, Store, Key)
+import { User, LogOut, ShoppingBag } from "lucide-react"; 
 import { useState, useEffect } from "react";
 
 const Navbar = () => {
@@ -67,28 +68,28 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* 🧭 Navigation Links */}
+          {/* 🧭 Navigation Links (Icons Removed) */}
           <div className="flex items-center space-x-8">
             
             <Link to="/" className="hidden md:flex items-center text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors">
-              <LayoutGrid className="w-4 h-4 mr-1.5" /> Collection
+              Collection
             </Link>
             
             {userInfo && (
               <div className="hidden md:flex items-center space-x-6">
                 <Link to="/add-product" className="flex items-center text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors">
-                  <PlusCircle className="w-4 h-4 mr-1.5" /> List Item
+                  List Item
                 </Link>
                 <Link to="/my-listings" className="flex items-center text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors">
-                  <Store className="w-4 h-4 mr-1.5" /> My Listings
+                  My Listings
                 </Link>
                 <Link to="/my-rentals" className="flex items-center text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors">
-                  <Key className="w-4 h-4 mr-1.5" /> My Rentals
+                  My Rentals
                 </Link>
               </div>
             )}
 
-            {/* 🛒 Premium Cart Link */}
+            {/* 🛒 Premium Cart Link (Kept the bag icon as it's standard UI) */}
             {userInfo && (
               <Link to="/cart" className="relative text-zinc-500 hover:text-zinc-900 transition-colors flex items-center">
                 <ShoppingBag className="w-6 h-6" />

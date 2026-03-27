@@ -19,7 +19,7 @@ const MyRentals = () => {
 
       try {
         // 2. Fetch only THIS user's orders using the endpoint we built
-        const response = await axios.get(`http://localhost:5000/api/orders/${userInfo.email}`);
+        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/orders/${userInfo.email}`);
         setOrders(response.data);
         setIsLoading(false);
       } catch (error) {

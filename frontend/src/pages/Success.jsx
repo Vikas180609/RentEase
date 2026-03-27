@@ -43,7 +43,7 @@ const Success = () => {
 
       try {
         // 4. Save to the database!
-        await axios.post('http://localhost:5000/api/orders', finalOrderData);
+        await axios.post('https://rentease-iz7b.onrender.com/api/orders', finalOrderData);
         
         // 5. Clean up local storage so the cart is empty again
         localStorage.removeItem('rentEaseCart');

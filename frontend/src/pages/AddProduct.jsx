@@ -47,7 +47,7 @@ const AddProduct = () => {
         }
       };
 
-      await axios.post('http://localhost:5000/api/products', formData, config);
+      await axios.post('https://rentease-iz7b.onrender.com/api/products', formData, config);
       
       setLoading(false);
       setSuccess(true);

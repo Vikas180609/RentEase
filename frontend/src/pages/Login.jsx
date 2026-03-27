@@ -26,7 +26,7 @@ const Login = () => {
     try {
       if (isLogin) {
         // 🚪 LOGIN REQUEST
-        const response = await axios.post('http://localhost:5000/api/auth/login', {
+        const response = await axios.post('https://rentease-iz7b.onrender.com/api/auth/login', {
           email: formData.email,
           password: formData.password
         });
@@ -36,7 +36,7 @@ const Login = () => {
         
       } else {
         // 📝 REGISTER REQUEST
-        await axios.post('http://localhost:5000/api/auth/register', {
+        await axios.post('https://rentease-iz7b.onrender.com/api/auth/register', {
           name: formData.name,
           email: formData.email,
           password: formData.password
