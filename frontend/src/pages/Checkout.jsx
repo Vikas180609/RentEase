@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { MapPin, Calendar, ShieldCheck, Sparkles } from 'lucide-react';
 
 const Checkout = () => {
@@ -38,7 +38,7 @@ const Checkout = () => {
 
     try {
       // 2. Ask backend to generate a Stripe Checkout URL
-      const response = await axios.post('https://rentease-iz7b.onrender.com/api/stripe/create-checkout-session', {
+      const response = await api.post('/api/stripe/create-checkout-session', {
         items: cart,
         userEmail: userInfo.email,
       });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { Sofa, Refrigerator, LayoutGrid, MapPin, ArrowUpRight, Loader2, Sparkles } from 'lucide-react';
 
 const Home = () => {
@@ -12,7 +12,7 @@ const Home = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/products?category=${selectedCategory}`);
+        const response = await api.get(`/api/products?category=${selectedCategory}`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

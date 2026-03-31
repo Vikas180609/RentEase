@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { MapPin, ShieldCheck, Clock, ArrowLeft, ShoppingCart, Sparkles } from 'lucide-react';
 
 const ProductDetails = () => {
@@ -15,7 +15,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/products/${id}`);
+        const response = await api.get(`/api/products/${id}`);
         setProduct(response.data);
         if (response.data.tenureOptions?.length > 0) {
           setSelectedTenure(response.data.tenureOptions[0]);

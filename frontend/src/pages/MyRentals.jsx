@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Package, Calendar, MapPin, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -19,7 +19,7 @@ const MyRentals = () => {
 
       try {
         // 2. Fetch only THIS user's orders using the endpoint we built
-        const response = await axios.get(`https://rentease-iz7b.onrender.com/api/orders/${userInfo.email}`);
+        const response = await api.get(`/api/orders/${userInfo.email}`);
         setOrders(response.data);
         setIsLoading(false);
       } catch (error) {

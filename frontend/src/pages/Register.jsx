@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/api";
 
 
 
@@ -26,9 +26,7 @@ const Register = () => {
     setError("");
 
     try {
-      // IMPORTANT: Update this URL if your backend route is different!
-      // If deployed, this should be your Render URL: 'https://rentease-api.onrender.com/api/users/register'
-      const { data } = await axios.post("https://rentease-iz7b.onrender.com/api/users/register", formData);
+      const { data } = await api.post("/api/users/register", formData);
 
       // Save the user data (and token) to localStorage so the Navbar knows they are logged in
       localStorage.setItem("userInfo", JSON.stringify(data));

@@ -14,10 +14,31 @@ dotenv.config();
 const app = express();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-app.use(express.json());
-app.use(cors());
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/rentease';
+const fallbackFrontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    ...(process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || '')
+        .split(',')
+        .map((origin) => origin.trim().replace(/\/+$/, ''))
+        .filter(Boolean),
+];
+const corsOrigins = [...new Set(allowedOrigins)];
 
-mongoose.connect('mongodb://localhost:27017/rentease')
+app.use(express.json());
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || corsOrigins.includes(origin.replace(/\/+$/, ''))) {
+            return callback(null, true);
+        }
+
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+}));
+
+mongoose.connect(mongoUri)
     .then(() => console.log('✅ RentEase Database Connected'))
     .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
@@ -105,6 +126,10 @@ app.put('/api/products/:id', async (req, res) => {
 app.post('/api/stripe/create-checkout-session', async (req, res) => {
     try {
         const { items, userEmail } = req.body;
+        const requestOrigin = req.headers.origin?.replace(/\/+$/, '');
+        const frontendBaseUrl = requestOrigin && corsOrigins.includes(requestOrigin)
+            ? requestOrigin
+            : fallbackFrontendUrl;
 
         const lineItems = items.map((item) => ({
             price_data: {
@@ -125,8 +150,8 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
             customer_email: userEmail,
             line_items: lineItems,
             mode: 'payment',
-            success_url: 'http://localhost:5173/success', 
-            cancel_url: 'http://localhost:5173/checkout',
+            success_url: `${frontendBaseUrl}/success`,
+            cancel_url: `${frontendBaseUrl}/checkout`,
         });
 
         res.json({ url: session.url });

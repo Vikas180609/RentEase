@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { Upload, DollarSign, Image as ImageIcon, Tag, MapPin, CheckCircle, Loader2 } from 'lucide-react';
 
 const AddProduct = () => {
@@ -47,7 +47,7 @@ const AddProduct = () => {
         }
       };
 
-      await axios.post('https://rentease-iz7b.onrender.com/api/products', formData, config);
+      await api.post('/api/products', formData, config);
       
       setLoading(false);
       setSuccess(true);
