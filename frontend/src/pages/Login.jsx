@@ -36,14 +36,15 @@ const Login = () => {
         
       } else {
         // 📝 REGISTER REQUEST
-        await api.post('/api/auth/register', {
+        const response = await api.post('/api/users/register', {
           name: formData.name,
           email: formData.email,
           password: formData.password
         });
-        
-        alert('Vault access granted! Please sign in.');
-        setIsLogin(true); 
+
+        localStorage.setItem('userInfo', JSON.stringify(response.data));
+        navigate('/');
+        window.location.reload();
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Authentication failed. Please try again.');
