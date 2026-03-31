@@ -14,7 +14,10 @@ dotenv.config();
 const app = express();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/rentease';
+const mongoUri =
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    'mongodb://localhost:27017/rentease';
 const fallbackFrontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
 const allowedOrigins = [
     'http://localhost:5173',
@@ -59,6 +62,7 @@ app.get('/api/products', async (req, res) => {
         const products = await Product.find(filter);
         res.json(products);
     } catch (error) {
+        console.error('Fetch Products Error:', error);
         res.status(500).json({ message: "Server Error: Could not fetch products" });
     }
 });
@@ -68,6 +72,7 @@ app.get('/api/products/owner/:email', async (req, res) => {
         const myProducts = await Product.find({ ownerEmail: req.params.email }).sort({ createdAt: -1 });
         res.json(myProducts);
     } catch (error) {
+        console.error('Fetch Owner Products Error:', error);
         res.status(500).json({ message: "Server Error: Could not fetch your listings" });
     }
 });
@@ -78,6 +83,7 @@ app.get('/api/products/:id', async (req, res) => {
         if (!product) return res.status(404).json({ message: "Product not found" });
         res.json(product);
     } catch (error) {
+        console.error('Fetch Product Details Error:', error);
         res.status(500).json({ message: "Server Error: Could not fetch product details" });
     }
 });
@@ -177,6 +183,7 @@ app.get('/api/orders/:email', async (req, res) => {
         const userOrders = await Order.find({ userEmail: req.params.email }).sort({ createdAt: -1 });
         res.json(userOrders);
     } catch (error) {
+        console.error('Fetch Orders Error:', error);
         res.status(500).json({ message: "Failed to fetch user orders." });
     }
 });
