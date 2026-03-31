@@ -47,7 +47,13 @@ const AddProduct = () => {
         }
       };
 
-      await api.post('/api/products', formData, config);
+      const payload = {
+        ...formData,
+        ownerName: userInfo?.name,
+        ownerEmail: userInfo?.email,
+      };
+
+      await api.post('/api/products', payload, config);
       
       setLoading(false);
       setSuccess(true);
