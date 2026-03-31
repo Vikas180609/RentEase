@@ -19,6 +19,7 @@ const mongoUri =
     process.env.MONGO_URI ||
     'mongodb://localhost:27017/rentease';
 const fallbackFrontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
+const vercelProjectPrefix = (process.env.VERCEL_PROJECT_PREFIX || 'rent-ease-qw9b').trim();
 const allowedOrigins = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
@@ -28,11 +29,32 @@ const allowedOrigins = [
         .filter(Boolean),
 ];
 const corsOrigins = [...new Set(allowedOrigins)];
+const isAllowedOrigin = (origin) => {
+    const normalizedOrigin = origin?.replace(/\/+$/, '');
+
+    if (!normalizedOrigin) {
+        return true;
+    }
+
+    if (corsOrigins.includes(normalizedOrigin)) {
+        return true;
+    }
+
+    if (
+        vercelProjectPrefix &&
+        normalizedOrigin.startsWith(`https://${vercelProjectPrefix}`) &&
+        normalizedOrigin.endsWith('.vercel.app')
+    ) {
+        return true;
+    }
+
+    return false;
+};
 
 app.use(express.json());
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || corsOrigins.includes(origin.replace(/\/+$/, ''))) {
+        if (isAllowedOrigin(origin)) {
             return callback(null, true);
         }
 
@@ -133,7 +155,7 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
     try {
         const { items, userEmail } = req.body;
         const requestOrigin = req.headers.origin?.replace(/\/+$/, '');
-        const frontendBaseUrl = requestOrigin && corsOrigins.includes(requestOrigin)
+        const frontendBaseUrl = requestOrigin && isAllowedOrigin(requestOrigin)
             ? requestOrigin
             : fallbackFrontendUrl;
 
