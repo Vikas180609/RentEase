@@ -5,6 +5,8 @@ import { Store, Trash2, Pencil, X, Sparkles } from 'lucide-react';
 const MyListings = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [unownedCount, setUnownedCount] = useState(0);
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,8 +26,43 @@ const MyListings = () => {
       }
     };
 
-    if (userInfo) fetchMyListings();
+    const fetchUnownedCount = async () => {
+      try {
+        const response = await api.get('/api/products/unowned/count');
+        setUnownedCount(response.data?.count ?? 0);
+      } catch (error) {
+        console.error("Error fetching unowned count:", error);
+      }
+    };
+
+    if (userInfo) {
+      fetchMyListings();
+      fetchUnownedCount();
+    }
   }, [userInfo]);
+
+  const handleClaimUnowned = async () => {
+    if (!userInfo?.email) return;
+
+    if (!window.confirm('Assign all unowned listings to your account?')) {
+      return;
+    }
+
+    try {
+      setIsClaiming(true);
+      await api.post(`/api/products/owner/${userInfo.email}/claim`, {
+        ownerName: userInfo?.name,
+      });
+
+      const response = await api.get(`/api/products/owner/${userInfo.email}`);
+      setListings(response.data);
+      setUnownedCount(0);
+    } catch (error) {
+      alert('Failed to claim listings. Please try again.');
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this listing from your vault?")) {
@@ -72,6 +109,24 @@ const MyListings = () => {
           </div>
           <h2 className="text-4xl font-black text-zinc-900 tracking-tight">My Listings</h2>
         </div>
+
+        {unownedCount > 0 && (
+          <div className="mb-8 bg-white border border-amber-100 rounded-[2rem] p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-2">Action Needed</p>
+              <p className="text-zinc-700 font-medium">
+                {unownedCount} listing{unownedCount === 1 ? '' : 's'} are missing an owner. Claim them to appear under your account.
+              </p>
+            </div>
+            <button
+              onClick={handleClaimUnowned}
+              disabled={isClaiming}
+              className="bg-zinc-950 text-white hover:bg-amber-500 hover:text-zinc-950 transition-colors px-6 py-3 rounded-xl text-sm font-bold shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isClaiming ? 'Claiming...' : `Claim ${unownedCount}`}
+            </button>
+          </div>
+        )}
 
         {listings.length === 0 ? (
           <div className="bg-white py-20 px-10 rounded-[2.5rem] shadow-sm border border-zinc-100 text-center">

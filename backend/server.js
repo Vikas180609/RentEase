@@ -91,11 +91,64 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/products/owner/:email', async (req, res) => {
     try {
-        const myProducts = await Product.find({ ownerEmail: req.params.email }).sort({ createdAt: -1 });
+        const ownerEmail = req.params.email;
+        const myProducts = await Product.find({ ownerEmail }).sort({ createdAt: -1 });
         res.json(myProducts);
     } catch (error) {
         console.error('Fetch Owner Products Error:', error);
         res.status(500).json({ message: "Server Error: Could not fetch your listings" });
+    }
+});
+
+app.get('/api/products/unowned/count', async (req, res) => {
+    try {
+        const count = await Product.countDocuments({
+            $or: [
+                { ownerEmail: { $exists: false } },
+                { ownerEmail: null },
+                { ownerEmail: '' },
+            ],
+        });
+
+        res.json({ count });
+    } catch (error) {
+        console.error('Fetch Unowned Products Count Error:', error);
+        res.status(500).json({ message: "Server Error: Could not fetch unowned count" });
+    }
+});
+
+app.post('/api/products/owner/:email/claim', async (req, res) => {
+    try {
+        const ownerEmail = req.params.email;
+        const ownerName = req.body?.ownerName;
+
+        if (!ownerEmail) {
+            return res.status(400).json({ message: "Owner email is required." });
+        }
+
+        const result = await Product.updateMany(
+            {
+                $or: [
+                    { ownerEmail: { $exists: false } },
+                    { ownerEmail: null },
+                    { ownerEmail: '' },
+                ],
+            },
+            {
+                $set: {
+                    ownerEmail,
+                    ...(ownerName ? { ownerName } : {}),
+                },
+            }
+        );
+
+        res.json({
+            matchedCount: result.matchedCount ?? result.n ?? 0,
+            modifiedCount: result.modifiedCount ?? result.nModified ?? 0,
+        });
+    } catch (error) {
+        console.error('Claim Owner Products Error:', error);
+        res.status(500).json({ message: "Server Error: Could not claim listings" });
     }
 });
 
