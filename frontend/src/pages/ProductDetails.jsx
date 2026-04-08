@@ -17,6 +17,12 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedTenure, setSelectedTenure] = useState(3);
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const isAdmin = !!userInfo?.email && adminEmails.includes(userInfo.email.toLowerCase());
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -51,6 +57,25 @@ const ProductDetails = () => {
     localStorage.setItem('rentEaseCart', JSON.stringify(cart));
     window.dispatchEvent(new Event('cartUpdated'));
     navigate('/cart');
+  };
+
+  const handleAdminDelete = async () => {
+    if (!isAdmin) return;
+
+    if (!window.confirm('Remove this product from the collection?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/admin/products/${product._id}`, {
+        headers: {
+          Authorization: `Bearer ${userInfo?.token}`,
+        },
+      });
+      navigate('/');
+    } catch (error) {
+      alert('Failed to remove product. Please try again.');
+    }
   };
 
   if (loading) {
@@ -165,13 +190,24 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              className="w-full bg-amber-500 text-zinc-950 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all flex items-center justify-center space-x-3 shadow-xl"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              <span>Secure This Piece</span>
-            </button>
+            <div className="grid grid-cols-1 gap-3">
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-amber-500 text-zinc-950 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all flex items-center justify-center space-x-3 shadow-xl"
+              >
+                <ShoppingCart className="w-6 h-6" />
+                <span>Secure This Piece</span>
+              </button>
+
+              {isAdmin && (
+                <button
+                  onClick={handleAdminDelete}
+                  className="w-full bg-zinc-950 text-white py-4 rounded-2xl font-bold text-sm hover:bg-red-600 transition-colors"
+                >
+                  Remove From Collection
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="p-6 bg-zinc-900 text-zinc-400 rounded-3xl flex items-start space-x-4 border border-zinc-800">

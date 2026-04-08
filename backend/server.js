@@ -8,6 +8,7 @@ import Product from './models/Product.js';
 import Order from './models/Order.js'; 
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import { requireAdmin } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -181,6 +182,17 @@ app.delete('/api/products/:id', async (req, res) => {
         res.json({ message: "Product removed from inventory" });
     } catch (error) {
         res.status(500).json({ message: "Server Error: Delete failed" });
+    }
+});
+
+app.delete('/api/admin/products/:id', requireAdmin, async (req, res) => {
+    try {
+        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+        if (!deletedProduct) return res.status(404).json({ message: "Product not found" });
+        res.json({ message: "Product removed from collection" });
+    } catch (error) {
+        console.error('Admin Delete Product Error:', error);
+        res.status(500).json({ message: "Server Error: Admin delete failed" });
     }
 });
 
